@@ -4,8 +4,8 @@ import TodoListItem from './TodoListItem';
 export default function TodoList() {
     return (
       <ul>
-        <li><TodoListItem/></li>
-        <li><TodoListItem/></li>
+        <li><TodoListItem label='Drink beer'/></li>
+        <li><TodoListItem label='Build React App' important/></li>
       </ul>
     )  
   }
