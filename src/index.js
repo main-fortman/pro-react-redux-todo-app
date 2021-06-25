@@ -9,15 +9,18 @@ const App = () => {
   const todoData = [
     {
       label: 'Dring Beer',
-      important: false
+      important: false,
+      id: 1
     },
     {
       label: 'Make Awesome App',
-      important: true
+      important: true,
+      id: 2
     },
     {
       label: 'Have a lunch',
-      important: false
+      important: false,
+      id: 3
     },
   ];
 
