@@ -4,10 +4,13 @@ import SearchPanel from '../searchPanel';
 import TodoList from '../todoList';
 import ItemStatusFilter from '../itemStatusFilter';
 import './App.css';
+import ItemAddForm from '../itemAddForm';
 
-export default function App() {
+export default class App extends React.Component {
 
-    const todoData = [
+  state ={
+    todoData:
+    [
       {
         label: 'Dring Beer',
         important: false,
@@ -23,15 +26,44 @@ export default function App() {
         important: false,
         id: 3
       },
-    ];
+    ]
+  }
+
+  deleteItem = (id) => {
+    this.setState(({todoData}) => {
+      const idx = todoData.findIndex(el => el.id === id);
+      const copy = todoData.slice();
+      copy.splice(idx, 1);
+      return {todoData: copy};
+    });
+  }
+
+  addItem = (text) => {
+    this.setState(({todoData}) => {
+      return {
+        todoData: [...todoData, {
+          label: text,
+          important: false,
+          id: Date.now()
+        }]
+      }
+    });
+  }
+
+  render() {
     return (
-        <div className="todo-app">
-        <AppHeader  toDo={1} done={3}/>
-        <div className="top-panel d-flex">
-          <SearchPanel/>
-          <ItemStatusFilter/>
-        </div>
-        <TodoList todos={todoData}/>
+      <div className="todo-app">
+      <AppHeader  toDo={1} done={3}/>
+      <div className="top-panel d-flex">
+        <SearchPanel/>
+        <ItemStatusFilter/>
       </div>
-      )
+      <TodoList 
+        todos={this.state.todoData} 
+        onDeleted={this.deleteItem}
+      />
+      <ItemAddForm onClickAdd={this.addItem}/>
+    </div>
+    )
+  }
 }
