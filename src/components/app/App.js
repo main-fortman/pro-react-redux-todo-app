@@ -8,25 +8,33 @@ import ItemAddForm from '../itemAddForm';
 
 export default class App extends React.Component {
 
+  maxId = 100;
+
   state ={
     todoData:
     [
-      {
-        label: 'Dring Beer',
-        important: false,
-        id: 1
-      },
-      {
-        label: 'Make Awesome App',
-        important: true,
-        id: 2
-      },
-      {
-        label: 'Have a lunch',
-        important: false,
-        id: 3
-      },
+      this.createTodoItem('Dring Beer'),
+      this.createTodoItem('Make Awesome App'),
+      this.createTodoItem('Have a lunch'),
     ]
+  }
+
+  createTodoItem(label) {
+    return {
+      id: this.maxId++,
+      label: label,
+      important: false,
+      done: false,
+      importnant: false,
+    }
+  }
+
+  toggleProp(arr, id, propName) {
+    const res = [...arr];
+    const item = arr.find(item => item.id === id);
+    const index = arr.indexOf(item);
+    res.splice(index, 1, {...item, [propName]: !item[propName]});
+    return res;
   }
 
   deleteItem = (id) => {
@@ -41,26 +49,40 @@ export default class App extends React.Component {
   addItem = (text) => {
     this.setState(({todoData}) => {
       return {
-        todoData: [...todoData, {
-          label: text,
-          important: false,
-          id: Date.now()
-        }]
+        todoData: [...todoData, this.createTodoItem(text)]
       }
     });
   }
 
+  onToggleImportant = id => {
+    this.setState(({todoData}) => {
+      return {todoData: this.toggleProp(todoData, id, 'important')};
+    });
+  }
+
+  onToggleDone = id => {
+    this.setState(({todoData}) => {
+      return {todoData: this.toggleProp(todoData, id, 'done')};
+    });
+  }
+
   render() {
+    const {todoData} = this.state;
+    const doneCount = todoData.filter(item => item.done).length;
+    const todoCount = todoData.length - doneCount;
+
     return (
       <div className="todo-app">
-      <AppHeader  toDo={1} done={3}/>
+      <AppHeader  toDo={todoCount} done={doneCount}/>
       <div className="top-panel d-flex">
         <SearchPanel/>
         <ItemStatusFilter/>
       </div>
       <TodoList 
-        todos={this.state.todoData} 
+        todos={todoData} 
         onDeleted={this.deleteItem}
+        onToggleImportant={this.onToggleImportant}
+        onToggleDone={this.onToggleDone}
       />
       <ItemAddForm onClickAdd={this.addItem}/>
     </div>
