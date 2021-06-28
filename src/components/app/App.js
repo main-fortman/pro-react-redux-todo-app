@@ -2,7 +2,7 @@ import React from 'react';
 import AppHeader from '../appHeader/';
 import SearchPanel from '../searchPanel';
 import TodoList from '../todoList';
-import ItemStatusFilter from '../itemStatusFilter';
+import ItemStatusFilter, {statusFilters} from '../itemStatusFilter';
 import './App.css';
 import ItemAddForm from '../itemAddForm';
 
@@ -10,13 +10,15 @@ export default class App extends React.Component {
 
   maxId = 100;
 
-  state ={
+  state = {
     todoData:
     [
-      this.createTodoItem('Dring Beer'),
+      this.createTodoItem('Drink Beer'),
       this.createTodoItem('Make Awesome App'),
       this.createTodoItem('Have a lunch'),
-    ]
+    ],
+    searchText: '',
+    statusFilter: statusFilters[0]
   }
 
   createTodoItem(label) {
@@ -25,7 +27,6 @@ export default class App extends React.Component {
       label: label,
       important: false,
       done: false,
-      importnant: false,
     }
   }
 
@@ -66,20 +67,39 @@ export default class App extends React.Component {
     });
   }
 
+  onChangeFilter = searchText => {
+    this.setState({searchText});
+  }
+
+  onClickStatusFilter = statusFilter => {
+    this.setState({statusFilter});
+  }
+
   render() {
-    const {todoData} = this.state;
+    const {todoData, searchText, statusFilter} = this.state;
     const doneCount = todoData.filter(item => item.done).length;
     const todoCount = todoData.length - doneCount;
+
+    // by text
+    let filteredTodoData = todoData.filter(
+      item => !searchText || item.label.toLowerCase().indexOf(searchText.trim().toLowerCase()) !== -1 );
+
+    // by status
+    filteredTodoData = filteredTodoData.filter(item => {
+      return (statusFilter === 'Done' && item.done) ||
+             (statusFilter === 'Active' && !item.done) ||
+             statusFilter === 'All';
+    });
 
     return (
       <div className="todo-app">
       <AppHeader  toDo={todoCount} done={doneCount}/>
       <div className="top-panel d-flex">
-        <SearchPanel/>
-        <ItemStatusFilter/>
+        <SearchPanel onChangeFilter={this.onChangeFilter}/>
+        <ItemStatusFilter filter={statusFilter} onClickStatusFilter={this.onClickStatusFilter}/>
       </div>
       <TodoList 
-        todos={todoData} 
+        todos={filteredTodoData} 
         onDeleted={this.deleteItem}
         onToggleImportant={this.onToggleImportant}
         onToggleDone={this.onToggleDone}
